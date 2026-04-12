@@ -25,8 +25,11 @@ Out of Scope For Now:
 
 
 # To Do LIST:
-- Add config file
-- client side has echo response fix bug
+- Add config file  ✅
+- client side has echo response fix bug (NOT REALLY PRIORITY)
 - add username to each user
+- extend code to hold multiple users
+- test with two users
+- Set up command line arguments
 - Figure out how to secure a log in for each server
 

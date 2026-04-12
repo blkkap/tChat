@@ -11,7 +11,6 @@ import (
 )
 
 type config struct{
-	PORT string `json:"PORT"`
 	LOCALHOST string `json:"LOCALHOST"`
 }
 
@@ -35,12 +34,15 @@ func main(){
 	if err != nil{
 		log.Fatal(err)
 	}
-	for{
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Text to send: ")
-		text, _ := reader.ReadString('\n')
-		fmt.Fprintf(conn, text + "\n")
-		message, _ := bufio.NewReader(conn).ReadString('\n')
-		fmt.Print("Message from server: " + message)
+	go func(){
+		
+		reader := bufio.NewScanner(conn)
+		for reader.Scan(){
+			fmt.Println(reader.Text())
+		}	
+	}()
+	message := bufio.NewScanner(os.Stdin)
+	for message.Scan(){
+		fmt.Println(message.Text())
 	}
 }

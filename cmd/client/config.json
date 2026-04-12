@@ -1,4 +1,5 @@
 {
     "PORT": ":8000",
-    "LOCALHOST": "localhost:8000"
-}:
+    "LOCALHOST": "localhost:8000",
+    "USERNAME" : "neo"
+}
