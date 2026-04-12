@@ -13,6 +13,7 @@ var Cfg config
 
 type config struct{
 	URL string `json:"URL"`
+	USERNAME string `json:"USERNAME"`
 }
 
 func getConfig(){
@@ -39,8 +40,15 @@ func main(){
 		log.Fatal("dial:", err)
 	}
 	defer conn.Close()
-	
-	message := "Hello"
+	/*for{
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Msg to send")
+		text, _ := reader.ReadString('\n')
+		fmt.Fprintf(conn,text + "\n")
+		message,_ := bufio.NewReader(conn).ReadString('\n')
+		fmt.Print()
+	}*/ 
+	message := Cfg.USERNAME + ": Hello"
 	err = conn.WriteMessage(websocket.TextMessage, []byte(message))
 	if err != nil{
 		log.Fatal(err)
@@ -52,6 +60,6 @@ func main(){
 			log.Println("Read:", err)
 			break
 		}
-		fmt.Printf("Recieved message: %s\n", message)
+		fmt.Printf("[%s]: %s\n",Cfg.USERNAME, message)
 	}
 }

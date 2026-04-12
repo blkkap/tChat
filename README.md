@@ -26,10 +26,12 @@ Out of Scope For Now:
 
 # To Do LIST:
 - Add config file  ✅
-- client side has echo response fix bug (NOT REALLY PRIORITY)
-- add username to each user
-- extend code to hold multiple users
+- add username to each user ✅ 
+- extend code to hold multiple users (Server side done) ✅
+- Lets user type out message which goes to server and everyone else except sender
 - test with two users
+
+## Least Important
 - Set up command line arguments
 - Figure out how to secure a log in for each server
-
+- client side has echo response fix bug (NOT REALLY PRIORITY)
