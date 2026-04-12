@@ -17,6 +17,9 @@ var clients = make(map[net.Conn]bool)
 var messages = make(chan string)
 var Cfg config
 
+
+
+
 func handleConnections(conn net.Conn){
 
 	scanner := bufio.NewScanner(conn)
@@ -64,6 +67,7 @@ func broadcaster(){
 func main() {
     getconfig()
     
+
     ln, err := net.Listen("tcp", Cfg.PORT)
     if err != nil {
         log.Fatal(err)
