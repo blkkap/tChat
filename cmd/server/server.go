@@ -76,7 +76,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request){
 	for{
 		_, message, err := conn.ReadMessage()
 		if err != nil{
-			log.Println("read from client %s: %v:",clientID, err)
+			log.Printf("read from client %s: %v:",clientID, err) //Log bug fixed
 			break
 		}
 		log.Printf("Recieved from client %s: %s", clientID, message)
@@ -114,6 +114,6 @@ func main(){
 	getConfig()
 	fmt.Println("Starting Server on: ", Cfg.PORT)
 	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/ws", websocketHandler)
+	http.HandleFunc("/ws", websocketHandler) //wss Secure connection
 	log.Fatal(http.ListenAndServe(Cfg.PORT, nil))
 }

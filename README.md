@@ -28,7 +28,7 @@ Out of Scope For Now:
 - Add config file  ✅
 - add username to each user ✅ 
 - extend code to hold multiple users (Server side done) ✅
-- Lets user type out message which goes to server and everyone else except sender
+- Lets user type out message which goes to server and everyone else except sender (SOMEWHAT)✅
 - test with two users
 
 ## Least Important

@@ -1,7 +1,7 @@
 package main
 
 import (
-	
+	"fmt"	
 	"os/signal"
 	"log"
 	"os"
@@ -36,12 +36,20 @@ func getConfig(){
 
 // Func that gets users input
 func getInput(input chan string){
+
+	//fmt.Print("\033[5 q") // [BAR CURSOR] might not be supported by all terminals
+	fmt.Printf("[%s] : \033[1 q", Cfg.USERNAME) // [BLOCK]
+	//fmt.Print("\033[3 q") // [UNDERLINE]
+	
+	//fmt.Printf("[%s] \r: ", Cfg.USERNAME)
+	//time.Sleep(500 * time.Millisecond)
 	results, err := in.ReadString('\n')
 	if err != nil{
 		log.Println(err)
 		return
 	}
 	input <- results
+	
 }
 
 
@@ -93,20 +101,4 @@ func main(){
 		}	
 
 	}
-	//message := Cfg.USERNAME + ": Hello"
-	//err = conn.WriteMessage(websocket.TextMessage, []byte(message))
-	/*
-	if err != nil{
-		log.Fatal(err)
-	}
-
-	for{
-		_, message, err := conn.ReadMessage()
-		if err != nil{
-			log.Println("Read:", err)
-			break
-		}
-		fmt.Printf("[%s]: %s\n",Cfg.USERNAME, message)
-	}
-	*/
 }
