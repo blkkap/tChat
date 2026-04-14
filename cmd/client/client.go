@@ -13,7 +13,10 @@ import (
 var Cfg config
 var in = bufio.NewReader(os.Stdin)
 
-
+type Message struct{
+        Message string `json:"message"`
+	Username string `json:"username"`
+}
 type config struct{
 	URL string `json:"URL"`
 	USERNAME string `json:"USERNAME"`
@@ -36,20 +39,20 @@ func getConfig(){
 
 // Func that gets users input
 func getInput(input chan string){
-
-	//fmt.Print("\033[5 q") // [BAR CURSOR] might not be supported by all terminals
-	fmt.Printf("[%s] : \033[1 q", Cfg.USERNAME) // [BLOCK]
-	//fmt.Print("\033[3 q") // [UNDERLINE]
+	for{
+		//fmt.Print("\033[5 q") // [BAR CURSOR] might not be supported by all terminals
+		fmt.Printf("[%s] : \033[1 q", Cfg.USERNAME) // [BLOCK]
+		//fmt.Print("\033[3 q") // [UNDERLINE]
 	
-	//fmt.Printf("[%s] \r: ", Cfg.USERNAME)
-	//time.Sleep(500 * time.Millisecond)
-	results, err := in.ReadString('\n')
-	if err != nil{
-		log.Println(err)
-		return
+		//fmt.Printf("[%s] \r: ", Cfg.USERNAME)
+		//time.Sleep(500 * time.Millisecond)
+		results, err := in.ReadString('\n')
+		if err != nil{
+			log.Println(err)
+			return
+		}
+		input <- results
 	}
-	input <- results
-	
 }
 
 
@@ -83,12 +86,18 @@ func main(){
 		case <- done:
 			return
 		case t := <-input:
-			err := conn.WriteMessage(websocket.TextMessage, []byte(t))
-			if err != nil{
-				log.Println("write err:", err)
-				return 
+			msg := Message{
+				Username: Cfg.USERNAME,
+				Message: t,
 			}
-			go getInput(input)
+			data, err := json.Marshal(msg)
+			if err != nil {
+				log.Println("json err:", err)
+				return
+			}
+			conn.WriteMessage(websocket.TextMessage, data)
+			
+			//go getInput(input)
 		case <-interrupt:
 			log.Println("Caught interrupt signal")
 			err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))

@@ -3,6 +3,7 @@ package main
 import(
 	"fmt"
 	"os"
+	"sync"
 	"time"
 	"log"
 	"strconv"
@@ -17,12 +18,17 @@ type config struct{
 }
 
 type Message struct{
-	message []byte
-	sender string
+	Username string `json:"username"`
+	Message string `json:"message"`
 }
 
+type Client struct{
+	Conn *websocket.Conn
+	Username string
+}
 
-var clients = make(map[string]*websocket.Conn)
+var mu sync.Mutex
+var clients = make(map[string]*Client)
 var broadcast = make(chan Message)
 var Cfg config
 
@@ -67,23 +73,36 @@ func websocketHandler(w http.ResponseWriter, r *http.Request){
 
 	// Generate a unique id for clients
 	clientID := strconv.Itoa(time.Now().Second())
-	clients[clientID] = conn
+	//clients[clientID] = conn
+	mu.Lock()
+	clients[clientID] = &Client{
+		Conn: conn,
+	}
+	mu.Unlock()
 	defer delete(clients, clientID)
 
 	log.Printf("Client connected: %s", clientID)
 
 
 	for{
+		/*
 		_, message, err := conn.ReadMessage()
 		if err != nil{
 			log.Printf("read from client %s: %v:",clientID, err) //Log bug fixed
 			break
 		}
 		log.Printf("Recieved from client %s: %s", clientID, message)
-
+		*/	
+		var msg Message 
+		err := conn.ReadJSON(&msg)
+		if err != nil{
+			log.Printf("read from client %s: %v:", clientID, err)
+			break
+		}
+		log.Printf("Received from [%s] : %s", msg.Username, msg.Message)
 		//Broaddcast as needed
 
-		broadcast <- Message{message, clientID}
+		broadcast <- msg
 
 		}
 		closeError := conn.Close()
@@ -93,20 +112,25 @@ func websocketHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func broadcastMessages(){
+
 	for msg := range broadcast{
+		formatted := fmt.Sprintf("%s : %s", msg.Username, msg.Message)
 		for id, client := range clients{
-			if id == msg.sender{
-				continue
-			}
-			err := client.WriteMessage(websocket.TextMessage, msg.message)
+		
+			err := client.Conn.WriteMessage(websocket.TextMessage, []byte(formatted))
 			if err != nil{
 				log.Printf("err broadcasting to client %s: %v", id, err)
+				client.Conn.Close()
+				mu.Lock()
 				delete(clients,id)
-				client.Close()
+				mu.Unlock()
+				//client.Close()
 			}
 		}
 	}
 }
+
+
 
 
 func main(){
