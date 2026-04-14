@@ -20,6 +20,7 @@ type config struct{
 type Message struct{
 	Username string `json:"username"`
 	Message string `json:"message"`
+	Sender *websocket.Conn
 }
 
 type Client struct{
@@ -102,7 +103,11 @@ func websocketHandler(w http.ResponseWriter, r *http.Request){
 		log.Printf("Received from [%s] : %s", msg.Username, msg.Message)
 		//Broaddcast as needed
 
-		broadcast <- msg
+		broadcast <- Message{
+			Username: msg.Username,
+			Message: msg.Message,
+			Sender: conn,
+		}
 
 		}
 		closeError := conn.Close()
@@ -115,20 +120,25 @@ func broadcastMessages(){
 
 	for msg := range broadcast{
 		formatted := fmt.Sprintf("%s : %s", msg.Username, msg.Message)
+		mu.Lock()
 		for id, client := range clients{
-		
+			if client.Conn == msg.Sender{
+				continue
+			}
 			err := client.Conn.WriteMessage(websocket.TextMessage, []byte(formatted))
 			if err != nil{
 				log.Printf("err broadcasting to client %s: %v", id, err)
 				client.Conn.Close()
-				mu.Lock()
+				//mu.Lock()
 				delete(clients,id)
-				mu.Unlock()
+				//mu.Unlock()
 				//client.Close()
+				}
 			}
-		}
+			mu.Unlock()
 	}
 }
+
 
 
 
