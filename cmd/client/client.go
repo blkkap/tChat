@@ -73,12 +73,14 @@ func main(){
 	go func(){
 		defer close(done)
 		for{
-			_, message, err := conn.ReadMessage()
+			_, _, err := conn.ReadMessage()
 			if err != nil{
 				log.Println("ReadMessage() err:", err)
 				return
 			}
-			log.Printf("Recieved: %s", message)
+			fmt.Printf("\r\033[2K")
+			//fmt.Printf("Recieved: %s", message)
+			fmt.Printf("[%s] : \033[1 q", Cfg.USERNAME)
 		}
 	}()
 	for {
