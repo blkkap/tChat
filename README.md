@@ -32,6 +32,15 @@ Out of Scope For Now:
 - test with two users ✅
 - Need to filter out sender own message ✅ 
 - Clean config file
+- Add server auth
+- Secure the server connection (sanatize)
+
+
+
+
+## Last Things TODO
+- Bundle app for easy installation
+  - make new git repo for bundle(public)
 
 ## Least Important
 - Set up command line arguments
