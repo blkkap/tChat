@@ -29,7 +29,8 @@ Out of Scope For Now:
 - add username to each user ✅ 
 - extend code to hold multiple users (Server side done) ✅
 - Lets user type out message which goes to server and everyone else except sender (SOMEWHAT)✅
-- test with two users
+- test with two users ✅
+- Need to filter out sender own message 
 
 ## Least Important
 - Set up command line arguments

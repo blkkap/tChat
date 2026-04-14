@@ -41,7 +41,7 @@ func getConfig(){
 func getInput(input chan string){
 	for{
 		//fmt.Print("\033[5 q") // [BAR CURSOR] might not be supported by all terminals
-		fmt.Printf("[%s] : \033[1 q", Cfg.USERNAME) // [BLOCK]
+		fmt.Printf("%s : \033[1 q", Cfg.USERNAME) // [BLOCK]
 		//fmt.Print("\033[3 q") // [UNDERLINE]
 	
 		//fmt.Printf("[%s] \r: ", Cfg.USERNAME)
@@ -73,14 +73,14 @@ func main(){
 	go func(){
 		defer close(done)
 		for{
-			_, _, err := conn.ReadMessage()
+			_, message, err := conn.ReadMessage()
 			if err != nil{
 				log.Println("ReadMessage() err:", err)
 				return
 			}
 			fmt.Printf("\r\033[2K")
-			//fmt.Printf("Recieved: %s", message)
-			fmt.Printf("[%s] : \033[1 q", Cfg.USERNAME)
+			fmt.Printf("%s", message)
+			fmt.Printf("%s : \033[1 q", Cfg.USERNAME)
 		}
 	}()
 	for {
