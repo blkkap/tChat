@@ -33,6 +33,7 @@ Out of Scope For Now:
 - Need to filter out sender own message ✅ 
 - Clean config file ✅
 - Set up user config files
+  - Set up way to delete files/look up past connections to rejoin if that server url is still valid
 - Add server auth
 - Secure the server connection (sanatize)
 
