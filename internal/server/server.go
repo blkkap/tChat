@@ -46,7 +46,7 @@ var upgrader = websocket.Upgrader{
 
 func getConfig(){
 
-	file, err := os.Open("config.json")
+	file, err := os.Open("../config/serverConfig.json")
 	if err != nil{
 		log.Fatal(err)
 	}
