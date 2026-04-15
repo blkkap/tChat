@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"fmt"	
@@ -23,7 +23,8 @@ type config struct{
 }
 
 func getConfig(){
-	file,err := os.Open("../config/clientConfig.json")
+
+	file,err := os.Open("internal/config/clientConfig.json")
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -56,7 +57,7 @@ func getInput(input chan string){
 }
 
 
-func main(){
+func Run(){
 	getConfig()
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)

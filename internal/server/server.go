@@ -1,4 +1,4 @@
-package main
+package server
 
 import(
 	"fmt"
@@ -46,7 +46,7 @@ var upgrader = websocket.Upgrader{
 
 func getConfig(){
 
-	file, err := os.Open("../config/serverConfig.json")
+	file,err := os.Open("internal/config/serverConfig.json")
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -143,7 +143,7 @@ func broadcastMessages(){
 
 
 
-func main(){
+func Run(){
 	go broadcastMessages()
 	getConfig()
 	fmt.Println("Starting Server on: ", Cfg.PORT)

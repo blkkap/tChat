@@ -1,4 +1,4 @@
-module github.com/blkkap/client
+module chat
 
 go 1.26.2
 
