@@ -31,7 +31,8 @@ Out of Scope For Now:
 - Lets user type out message which goes to server and everyone else except sender (SOMEWHAT)✅
 - test with two users ✅
 - Need to filter out sender own message ✅ 
-- Clean config file
+- Clean config file ✅
+- Set up user config files
 - Add server auth
 - Secure the server connection (sanatize)
 
