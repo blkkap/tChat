@@ -9,11 +9,13 @@ import(
 	"strconv"
 	"encoding/json"
 	"net/http"
+	"path/filepath"
 	"github.com/gorilla/websocket"
+	"chat/internal/config"
 )
 
 
-type config struct{
+type Serverconfig struct{
 	PORT string `json:"PORT"`
 }
 
@@ -31,7 +33,7 @@ type Client struct{
 var mu sync.Mutex
 var clients = make(map[string]*Client)
 var broadcast = make(chan Message)
-var Cfg config
+var Cfg Serverconfig
 
 
 var upgrader = websocket.Upgrader{
@@ -42,11 +44,42 @@ var upgrader = websocket.Upgrader{
 
 }
 
+func ensureConfigDir(){
+	dir, err := os.UserConfigDir()
+	if err != nil{
+		log.Fatal(err)
+	}
+	path := filepath.Join(dir, "tchat")
+	
+	err = os.MkdirAll(path, 0755)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
 
+func ensureServerConfig(){
+	path := config.ServerConfigPath()
+
+	if _, err := os.Stat(path); os.IsNotExist(err){
+		fmt.Println("First Time Set Up: Creating server cofig....")
+
+		cfg :=Serverconfig{
+			PORT: "",
+		}
+		data,err := json.MarshalIndent(cfg, "", " ")
+		if err != nil{
+			log.Fatal(err)
+		}
+		err =os.WriteFile(path,data,0644)
+		if err != nil{
+			log.Fatal(err)
+		}
+	}
+}
 
 func getConfig(){
 
-	file,err := os.Open("internal/config/serverConfig.json")
+	file,err := os.Open(config.ServerConfigPath())
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -57,6 +90,29 @@ func getConfig(){
 	if err != nil{
 		log.Fatal(err)
 	}
+}
+
+func promptIfEmpty(){
+	if Cfg.PORT == ""{
+		fmt.Print("Enter server port (e.g. :8080): ")
+
+		var input string
+		fmt.Scanln(&input)
+		Cfg.PORT = input
+
+		saveConfig()
+	}
+}
+
+
+func saveConfig(){
+	path := config.ServerConfigPath()
+
+	data, err := json.MarshalIndent(Cfg, "", " ")
+	if err != nil{
+		log.Fatal(err)
+	}
+	os.WriteFile(path,data,0644)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request){
@@ -144,8 +200,12 @@ func broadcastMessages(){
 
 
 func Run(){
-	go broadcastMessages()
+	ensureConfigDir()
+	ensureServerConfig()
 	getConfig()
+	promptIfEmpty()
+	
+	go broadcastMessages()
 	fmt.Println("Starting Server on: ", Cfg.PORT)
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/ws", websocketHandler) //wss Secure connection
