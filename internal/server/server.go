@@ -45,6 +45,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func ensureConfigDir(){
+	
 	dir, err := os.UserConfigDir()
 	if err != nil{
 		log.Fatal(err)
@@ -55,16 +56,20 @@ func ensureConfigDir(){
 	if err != nil{
 		log.Fatal(err)
 	}
+	err = os.MkdirAll(filepath.Join(path, "server"), 0755)
+	if err != nil{
+		log.Fatal(err)
+	}
 }
 
 func ensureServerConfig(){
 	path := config.ServerConfigPath()
 
 	if _, err := os.Stat(path); os.IsNotExist(err){
-		fmt.Println("First Time Set Up: Creating server cofig....")
-
-		cfg :=Serverconfig{
-			PORT: "",
+		fmt.Println("First Time Set Up: Creating server config....")
+		promptIfEmpty()
+		/*cfg :=Serverconfig{
+			PORT: ":8000",
 		}
 		data,err := json.MarshalIndent(cfg, "", " ")
 		if err != nil{
@@ -73,7 +78,7 @@ func ensureServerConfig(){
 		err =os.WriteFile(path,data,0644)
 		if err != nil{
 			log.Fatal(err)
-		}
+		}*/
 	}
 }
 
