@@ -6,25 +6,76 @@ import (
 	"log"
 	"os"
 	"bufio"
+	"path/filepath"
 	"github.com/gorilla/websocket"
 	"encoding/json"
+	"chat/internal/config"
 )
 
-var Cfg config
+var Cfg clientConfig
 var in = bufio.NewReader(os.Stdin)
 
 type Message struct{
         Message string `json:"message"`
 	Username string `json:"username"`
 }
-type config struct{
+type clientConfig struct{
 	URL string `json:"URL"`
 	USERNAME string `json:"USERNAME"`
 }
 
+
+
+func ensureConfigDir(){
+	dir, err := os.UserConfigDir()
+	if err != nil{
+		log.Fatal(err)
+	}
+	path := filepath.Join(dir, "tchat")
+
+	err = os.MkdirAll(filepath.Join(path,"client"), 0755)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
+func ensureClientConfig(){
+	path := config.ClientConfigPath()
+	if _, err := os.Stat(path); os.IsNotExist(err){
+		fmt.Print("First Time Set Up: Creating client config.....")
+		prompIfEmpty()
+	}
+}
+
+
+func prompIfEmpty(){
+	if Cfg.URL == "" || Cfg.USERNAME == ""{
+		fmt.Print("\nEnter URL (e.g, : wss://URL.com/ws): ")
+		var url string
+		fmt.Scanln(&url)
+		Cfg.URL = url
+
+		fmt.Print("Enter USERNAME: ")
+		var username string
+		fmt.Scanln(&username)
+		Cfg.USERNAME = username
+
+		saveConfig()
+	}
+}
+
+func saveConfig(){
+	path := config.ClientConfigPath()
+	data, err := json.MarshalIndent(Cfg,""," ")
+	if err != nil{
+		log.Fatal(err)
+	}
+	os.WriteFile(path,data,0644)
+}
+
 func getConfig(){
 
-	file,err := os.Open("internal/config/clientConfig.json")
+	file,err := os.Open(config.ClientConfigPath())
 	if err != nil{
 		log.Fatal(err)
 	}
@@ -58,7 +109,10 @@ func getInput(input chan string){
 
 
 func Run(){
+	ensureConfigDir()
+	ensureClientConfig()
 	getConfig()
+	prompIfEmpty()
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 	input := make(chan string, 1)

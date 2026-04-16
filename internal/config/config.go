@@ -19,7 +19,7 @@ func ConfigDir() string{
 	}
 	return path
 }
-
+//edits should go here if user naming is allowed
 func ServerConfigPath() string {
 	return filepath.Join(ConfigDir(),"server", "serverConfig.json")
 }
