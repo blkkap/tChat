@@ -157,12 +157,19 @@ func Run(){
 			//go getInput(input)
 		case <-interrupt:
 			log.Println("Caught interrupt signal")
+			//log.Println(config.ClientConfigPath())
 			err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 
 			if err != nil{
 				log.Println("Write close err:", err)
 				return
 			}
+			path := config.ClientConfigPath()
+			err = os.Remove(path)
+			if err != nil{
+				log.Fatal(err)
+			}
+
 			return
 		}	
 

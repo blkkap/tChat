@@ -147,14 +147,6 @@ func websocketHandler(w http.ResponseWriter, r *http.Request){
 
 
 	for{
-		/*
-		_, message, err := conn.ReadMessage()
-		if err != nil{
-			log.Printf("read from client %s: %v:",clientID, err) //Log bug fixed
-			break
-		}
-		log.Printf("Recieved from client %s: %s", clientID, message)
-		*/	
 		var msg Message 
 		err := conn.ReadJSON(&msg)
 		if err != nil{
@@ -196,12 +188,18 @@ func broadcastMessages(){
 				//client.Close()
 				}
 			}
-			mu.Unlock()
+		mu.Unlock()
 	}
 }
 
 
-
+func cleanDir(){
+	path := config.ServerConfigPath()
+	err := os.Remove(path)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
 
 
 func Run(){
@@ -209,10 +207,12 @@ func Run(){
 	ensureServerConfig()
 	getConfig()
 	promptIfEmpty()
-	
 	go broadcastMessages()
 	fmt.Println("Starting Server on: ", Cfg.PORT)
 	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/ws", websocketHandler) //wss Secure connection
-	log.Fatal(http.ListenAndServe(Cfg.PORT, nil))
+	http.HandleFunc("/ws", websocketHandler) 
+	err := (http.ListenAndServe(Cfg.PORT, nil))
+	if err != nil{
+		log.Fatal(err)
+	}
 }
