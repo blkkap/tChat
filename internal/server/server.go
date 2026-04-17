@@ -3,6 +3,9 @@ package server
 import(
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
+	"context"
 	"sync"
 	"time"
 	"log"
@@ -199,11 +202,34 @@ func Run(){
 	getConfig()
 	promptIfEmpty()
 	go broadcastMessages()
-	fmt.Println("Starting Server on: ", Cfg.PORT)
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/ws", websocketHandler) 
-	err := (http.ListenAndServe(Cfg.PORT, nil))
-	if err != nil{
-		log.Fatal(err)
+	//fmt.Println("Starting Server on: ", Cfg.PORT)
+
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", homeHandler)
+	mux.HandleFunc("/ws", websocketHandler) 
+	server := &http.Server{
+		Addr: Cfg.PORT,
+		Handler: mux,
 	}
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	
+	go func(){
+		log.Println("Starting Server on: ", Cfg.PORT)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed{
+			log.Fatal("ListenAndServe: %v", err)
+		}
+	}()
+	<-stop
+	log.Println("self destruct......")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil{
+		log.Fatal("destruction failed:%+v", err)
+	}
+	log.Println("Stopped")
 }
