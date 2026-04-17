@@ -3,6 +3,7 @@ package server
 import(
 	"fmt"
 	"os"
+	"io"
 	"os/signal"
 	"syscall"
 	"context"
@@ -224,7 +225,7 @@ func Run(){
 	}()
 	<-stop
 	log.Println("self destruct......")
-
+	
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 	defer cancel()
@@ -232,4 +233,24 @@ func Run(){
 		log.Fatal("destruction failed:%+v", err)
 	}
 	log.Println("Stopped")
+	cleanDir()
+	var isStopped = false
+	
+	f, err := os.Open(config.ServerConfigPath())
+	if err != nil{
+		isStopped = true
+		log.Fatal("Clean up Successful: ", isStopped)
+		return
+	}
+
+	defer f.Close()
+
+	_, err = f.Readdirnames(1)
+
+	if err == io.EOF{
+		isStopped = true
+		log.Println("Clean up Successful: ", isStopped)
+		return
+	}
+	return 
 }
