@@ -68,17 +68,6 @@ func ensureServerConfig(){
 	if _, err := os.Stat(path); os.IsNotExist(err){
 		fmt.Println("First Time Set Up: Creating server config....")
 		promptIfEmpty()
-		/*cfg :=Serverconfig{
-			PORT: ":8000",
-		}
-		data,err := json.MarshalIndent(cfg, "", " ")
-		if err != nil{
-			log.Fatal(err)
-		}
-		err =os.WriteFile(path,data,0644)
-		if err != nil{
-			log.Fatal(err)
-		}*/
 	}
 }
 
@@ -169,6 +158,8 @@ func websocketHandler(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+
+
 func broadcastMessages(){
 
 	for msg := range broadcast{
@@ -188,7 +179,7 @@ func broadcastMessages(){
 				//client.Close()
 				}
 			}
-		mu.Unlock()
+			mu.Unlock()
 	}
 }
 
