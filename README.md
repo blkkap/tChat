@@ -5,8 +5,7 @@
 
 ## Install tChat
 ### Mac / Linux
-```curl -sL https://raw.githubusercontent.com/blkkap/tChat/main/install.sh | bash
-
+```curl -sL https://raw.githubusercontent.com/blkkap/tChat/main/install.sh | bash```
 ### Windows
 - Download from GitHub Releases and run ./tchat.exe
 
