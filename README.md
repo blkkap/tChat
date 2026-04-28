@@ -11,6 +11,11 @@ curl -sL https://raw.githubusercontent.com/blkkap/tChat/main/install.sh | bash
 
 ### Windows
 - Download from GitHub Releases and run ./tchat.exe
+### How to run
+```text
+macOS command: tchat
+Windows command: ./tchat
+```
 
 ## Building from root 
   ### Building from source folder
